@@ -41,4 +41,23 @@
 
         }
     }
+
+    public class ContructorNotFoundException : Exception
+    {        
+        public Type Type { get; }
+        public override string Message { get; }
+        public ContructorNotFoundException(Type type, string msg = "")
+        {
+
+            Message = msg;
+
+            if (String.IsNullOrEmpty(msg))
+            {
+                Message = $"The type {type.Name} do not have any public parameterless constructor";
+            }
+                        
+            Type = type;
+
+        }
+    }
 }

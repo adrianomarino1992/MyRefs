@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Linq;
+using System.Collections;
 
 namespace MyRefs.Extensions
 {
@@ -51,12 +53,29 @@ namespace MyRefs.Extensions
         }
 
 
+        public static ConstructorInfo? GetParameterlessCtor<T>(this T thing)
+        {
+            return GetParameterlessCtor(thing.GetType());
+        }
+
+        public static ConstructorInfo? GetParameterlessCtor(Type type)
+        {
+            return type.GetConstructor(new Type[] { });
+        }
+
         public static PropertyInfo[]? GetPublicProperties(Type thing, Func<PropertyInfo, bool> expression)
         {
             return thing.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                .Where(expression)
                .ToArray();
         }
+
+        public static FieldInfo[]? GetPublicFields(Type thing, Func<FieldInfo, bool> expression)
+        {
+            return thing.GetFields(BindingFlags.Public | BindingFlags.Instance).Where(expression).ToArray();               
+        }
+
+       
 
         public static PropertyInfo? GetPublicProperty(Type thing, Func<PropertyInfo, bool> expression)
         {
@@ -68,6 +87,13 @@ namespace MyRefs.Extensions
         public static PropertyInfo[]? GetPublicProperties<T>(this T thing, Func<PropertyInfo, bool> expression)
         {
             return thing.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+               .Where(expression)
+               .ToArray();
+        }
+
+        public static FieldInfo[]? GetPublicFields<T>(this T thing, Func<FieldInfo, bool> expression)
+        {
+            return thing.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance)
                .Where(expression)
                .ToArray();
         }
@@ -108,7 +134,7 @@ namespace MyRefs.Extensions
                
         }
 
-        public static void SetFieldValue(this object @object, string field, object value)
+        public static void SetFieldValue(this object @object, string field, object? value)
         {
             FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
 
@@ -123,7 +149,7 @@ namespace MyRefs.Extensions
 
         public static object GetPropertyValue(this object @object, string prop)
         {
-            PropertyInfo[] properties = @object.GetPublicProperties(s => true);
+            PropertyInfo[] properties = @object.GetPublicProperties(s => s.Name == prop);
 
             if (properties == null || properties.Count() == 0)
                 try
@@ -143,7 +169,7 @@ namespace MyRefs.Extensions
 
         public static T GetPropertyValue<T>(this object @object, string prop)
         {
-            PropertyInfo[] properties = @object.GetPublicProperties(s => true);
+            PropertyInfo[] properties = @object.GetPublicProperties(s => s.Name == prop);
 
             if (properties == null || properties.Count() == 0)
                 try
@@ -166,9 +192,9 @@ namespace MyRefs.Extensions
             }
         }
 
-        public static void SetPropertyValue(this object @object, string prop, object value)
+        public static void SetPropertyValue(this object @object, string prop, object? value)
         {
-            PropertyInfo[] properties = @object.GetPublicProperties(s => true);
+            PropertyInfo[] properties = @object.GetPublicProperties(s => s.Name == prop);
 
             if (properties == null || properties.Count() == 0)
                 try
