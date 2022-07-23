@@ -157,7 +157,8 @@ namespace MyRefs.Extensions
 
         public static object GetFieldValue(this object @object, string prop)
         {
-            FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(s => s.Name == prop).ToArray();
 
             if (fieldInfos == null || fieldInfos.Count() == 0)
                 throw new Exceptions.FieldNotFoundException(@object.GetType(), prop);
@@ -167,7 +168,8 @@ namespace MyRefs.Extensions
 
         public static T GetFieldValue<T>(this object @object, string prop)
         {
-            FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(s => s.Name == prop).ToArray();
 
             if (fieldInfos == null || fieldInfos.Count() == 0)
                 throw new Exceptions.FieldNotFoundException(@object.GetType(), prop);
@@ -186,7 +188,8 @@ namespace MyRefs.Extensions
 
         public static void SetFieldValue(this object @object, string field, object? value)
         {
-            FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fieldInfos = @object.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(s => s.Name == field).ToArray();
 
             if (fieldInfos == null || fieldInfos.Count() == 0)
                 throw new Exceptions.FieldNotFoundException(@object.GetType(), field);
