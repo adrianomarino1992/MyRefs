@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MyRefs.Extensions;
 using System.Reflection;
-using MyRefs.Extensions;
 
 namespace MyRefs.Validations
 {
     public static class ValidationExtension
     {
-        public static bool IsNull<T>(this T thing) 
+        public static bool IsNull<T>(this T thing)
         {
             return thing == null;
         }
 
-        public static bool IsEquals<T>(this T thing, T other) 
+        public static bool IsEquals<T>(this T thing, T other)
         {
             if (other == null || thing == null)
                 return false;
@@ -25,7 +20,7 @@ namespace MyRefs.Validations
 
             PropertyInfo[]? props = thing.GetPublicProperties(s => s.PropertyType.IsValueType || s.PropertyType == typeof(string));
 
-            if(props != null)
+            if (props != null)
             {
                 for (int i = 0; i < props.Length; i++)
                 {
@@ -71,7 +66,7 @@ namespace MyRefs.Validations
 
             ConstructorInfo? ctor = thing.GetParameterlessCtor();
 
-            if(ctor == null)
+            if (ctor == null)
             {
                 throw new Exceptions.ContructorNotFoundException(thing.GetType());
             }
@@ -79,7 +74,7 @@ namespace MyRefs.Validations
             T i = (T)ctor.Invoke(new object[] { });
 
             return i.IsEquals(thing);
-            
+
         }
     }
 }

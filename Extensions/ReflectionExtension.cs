@@ -26,7 +26,7 @@ namespace MyRefs.Extensions
 #pragma warning disable
             MethodInfo? methodInfo = null;
 
-            methodInfo = thing.GetType().GetMethod(method, argsTypes ?? new Type[] { });
+            methodInfo = thing.GetType().GetMethods().FirstOrDefault(s => s.Name == method && s.GetGenericArguments().Count() == (generics?.Count() ?? 0));
 
             if (argsTypes != null && argsTypes.Length > 0)
             {
@@ -266,5 +266,114 @@ namespace MyRefs.Extensions
 
         }
 
+
+        public static T GetValueFromIndexOfCollection<T>(this object @object, string prop, int index)
+        {
+            object list = @object.GetPropertyValue(prop);
+                       
+
+            if(list == null)
+                throw new Exceptions.ArrayIsNullException(@object.GetType(), prop);
+
+            Type objType = list.GetType();
+
+            if(!objType.IsAssignableTo(typeof(IEnumerable)))
+                throw new Exceptions.InvalidPropertyException(@object.GetType(), prop, 
+                    $"{objType.Name}.{prop} is not a list or array");
+
+
+            //check for list
+            {
+                if (objType.IsAssignableTo(typeof(IList)))
+                {
+                    if (!list.GetType().GetGenericArguments()[0].Equals(typeof(T)))
+                    {
+                        throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                   $"{objType.Name}.{prop} is not a list of type {typeof(T).Name}");
+                    }
+
+                    return (T)((list as IList)[index]); 
+                }
+            }
+
+
+            //check for array
+            {
+                if (objType.IsAssignableTo(typeof(System.Array)))
+                {
+                    if (!list.GetType().GetElementType().Equals(typeof(T)))
+                    {
+                        throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                   $"{objType.Name}.{prop} is not a array of type {typeof(T).Name}");
+                    }
+
+                    return (T)((list as Array).GetValue(index));
+                }
+            }
+
+
+            throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                   $"{objType.Name}.{prop} is not a array or list of type {typeof(T).Name}");
+
+
+            return default(T);
+
+        }
+
+
+        public static void SetValueInIndexOfCollection<T>(this object @object, string prop, int index, T value)
+        {
+            object list = @object.GetPropertyValue(prop);
+
+
+            if (list == null)
+                throw new Exceptions.ArrayIsNullException(@object.GetType(), prop);
+
+            Type objType = list.GetType();
+
+            if (!objType.IsAssignableTo(typeof(IEnumerable)))
+                throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                    $"{objType.Name}.{prop} is not a list or array");
+
+
+            //check for list
+            {
+                if (objType.IsAssignableTo(typeof(IList)))
+                {
+                    if (!list.GetType().GetGenericArguments()[0].Equals(typeof(T)))
+                    {
+                        throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                   $"{objType.Name}.{prop} is not a list of type {typeof(T).Name}");
+                    }
+
+                    (list as IList)[index] = value;
+
+                    return;
+                }
+            }
+
+
+            //check for array
+            {
+                if (objType.IsAssignableTo(typeof(System.Array)))
+                {
+                    if (!list.GetType().GetElementType().Equals(typeof(T)))
+                    {
+                        throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                   $"{objType.Name}.{prop} is not a array of type {typeof(T).Name}");
+                    }
+
+                    (list as Array).SetValue(value, index);
+
+                    return;
+                }
+            }
+
+
+            throw new Exceptions.InvalidPropertyException(@object.GetType(), prop,
+                   $"{objType.Name}.{prop} is not a array or list of type {typeof(T).Name}");
+
+
+        }
     }
 }

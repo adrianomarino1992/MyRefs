@@ -60,4 +60,47 @@
 
         }
     }
+
+    public class ArrayIsNullException : Exception
+    {
+        public string Property { get; }
+        public Type Type { get; }
+        public override string Message { get; }
+        public ArrayIsNullException(Type type, string prop, string msg = "")
+        {
+
+            Message = msg;
+
+            if (String.IsNullOrEmpty(msg))
+            {
+                Message = $"The property {prop} is null";
+            }
+
+            Property = prop;
+            Type = type;
+
+        }
+    }
+
+
+    public class InvalidPropertyException : Exception
+    {
+        public string Property { get; }
+        public Type Type { get; }
+        public override string Message { get; }
+        public InvalidPropertyException(Type type, string prop, string msg = "")
+        {
+
+            Message = msg;
+
+            if (String.IsNullOrEmpty(msg))
+            {
+                Message = $"The property {prop} is invalid";
+            }
+
+            Property = prop;
+            Type = type;
+
+        }
+    }
 }
