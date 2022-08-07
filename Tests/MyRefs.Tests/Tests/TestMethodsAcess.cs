@@ -45,6 +45,7 @@ namespace MyRefs.Tests.Tests
         }
 
 
+
         [Fact]
         public void CallMethodWithParametersAndGenerics()
         {
